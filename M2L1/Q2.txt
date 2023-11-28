@@ -1,0 +1,92 @@
+import java.util.Stack;
+// import javafx.util.Pair;
+
+class Pair<K, V> {
+    private K key;
+    private V value;
+    
+    public Pair(K key, V value){
+        this.key = key;
+        this.value = value;
+    }
+    
+    public K getKey(){
+        return key;
+    }
+    public V getValue(){
+        return value;
+    }
+}
+
+class CustomStack {
+    private StringBuilder text;
+    private Stack<Pair<Integer, String>> operations;
+
+    public CustomStack() {
+        text = new StringBuilder();
+        operations = new Stack<>();
+    }
+
+    public void insert(String value) {
+        text.append(value);
+        operations.push(new Pair<>(1, value));
+    }
+
+    public void deleteChars(int value) {
+        String deletedChars = text.substring(text.length() - value);
+        text.setLength(text.length() - value);
+        operations.push(new Pair<>(2, deletedChars));
+    }
+
+    public char getChar(int index) {
+        char result = text.charAt(index - 1);
+        System.out.println(result);
+        operations.push(new Pair<>(3, String.valueOf(result)));
+        return result;
+    }
+
+    public void undo() {
+        if (!operations.isEmpty()) {
+            Pair<Integer, String> operation = operations.pop();
+            int opType = operation.getKey();
+            String opValue = operation.getValue();
+            if (opType == 1) {
+                text.delete(text.length() - opValue.length(), text.length());
+            } else if (opType == 2) {
+                text.append(opValue);
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        CustomStack editor = new CustomStack();
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+        String input = scanner.nextLine();
+        String[] commands = input.split(",");
+
+        for (String cmd : commands) {
+            String[] parts = cmd.trim().split(" ");
+            String command = parts[0];
+            String value = parts.length > 1 ? parts[1] : "";
+
+            switch (command) {
+                case "1":
+                    editor.insert(value);
+                    break;
+                case "3":
+                    int intValue = Integer.parseInt(value);
+                    editor.getChar(intValue);
+                    break;
+                case "2":
+                    int intValue2 = Integer.parseInt(value);
+                    editor.deleteChars(intValue2);
+                    break;
+                case "4":
+                    editor.undo();
+                    break;
+            }
+        }
+    }
+}
